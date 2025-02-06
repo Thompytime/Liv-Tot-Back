@@ -1,14 +1,20 @@
 import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
 
 app = Flask(__name__)
 
 # Replace this with your Render database URI
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://liv_tot_user:W1RyiS7p9yxojoIzw704mPAwEJOYCQDW@dpg-cuigakhu0jms738p11qg-a/liv_tot'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://liv_tot_user:W1RyiS7p9yxojoIzw704mPAwEJOYCQDW@dpg-cuigakhu0jms738p11qg-a.frankfurt-postgres.render.com/liv_tot'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
+# Initialize the migration extension
+migrate = Migrate(app, db)
+
 
 class Prediction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
