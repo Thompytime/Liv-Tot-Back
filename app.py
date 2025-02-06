@@ -23,15 +23,33 @@ class Prediction(db.Model):
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    data = request.get_json()
-    liverpool_score = data.get('liverpoolScore')
-    tottenham_score = data.get('tottenhamScore')
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"message": "No JSON data provided"}), 400
+        
+        # Log the data to check its format
+        print("Received data:", data)
 
-    new_prediction = Prediction(liverpool_score=liverpool_score, tottenham_score=tottenham_score)
-    db.session.add(new_prediction)
-    db.session.commit()
+        liverpool_score = data.get('liverpoolScore')
+        tottenham_score = data.get('tottenhamScore')
 
-    return jsonify({'message': 'Prediction saved'}), 201
+        if liverpool_score is None or tottenham_score is None:
+            return jsonify({"message": "Missing score values"}), 400
+
+        # Save prediction in the database
+        new_prediction = Prediction(liverpool_score=liverpool_score, tottenham_score=tottenham_score)
+        db.session.add(new_prediction)
+        db.session.commit()
+
+        return jsonify({'message': 'Prediction saved'}), 201
+
+    except Exception as e:
+        return jsonify({"message": f"Error: {str(e)}"}), 500
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
+
+
